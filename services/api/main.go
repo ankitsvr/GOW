@@ -10,7 +10,6 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/gofiber/fiber/v2/log"
 )
 
 type Telemetry struct {
@@ -105,5 +104,22 @@ func handleGetTelemetry(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(out)
 
 }
+func handleSendCommand(w http.ResponseWriter, r *http.Request) {
+	var cmd struct {
+		DeviceID string `json:"deviceid"`
+		Command interface{} `json:"command"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&cmd); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
 
+	topic := fmt.Sprintf("devices/%s/Command", cmd.DeviceID)
+	payload, _ := json.Marshal(cmd)
+	token :=mqttClient.Publish(topic, 0, false, payload)
+	token.Wait()
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"status":"command sent"}`))
+}
 
