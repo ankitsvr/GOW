@@ -40,7 +40,7 @@ func handleTelemetry(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "DB Query Error", http.StatusInternalServerError)
 	}
-	defer rows.Close()
+	defer rows.Scan.Close()
 	var out []Telemetry
 	for rows.Next() {
 		var t Telemetry

@@ -2,7 +2,7 @@ version: '3.8'
 services:
   mqtt:
     image: eclipse-mosquitto:2.0
-    container_name: ha_mosquitto
+    container_name: gow_mosquitto
     ports:
       - "1883:1883"    # MQTT
       - "9001:9001"    # Websockets (useful later)
@@ -13,26 +13,14 @@ services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: ha
-      POSTGRES_PASSWORD: ha_pass
-      POSTGRES_DB: ha_db
+      POSTGRES_USER: gow
+      POSTGRES_PASSWORD: gow_pass
+      POSTGRES_DB: gow_db
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-
-  api:
-    build: ./services/api
-    container_name: ha_api
-    ports:
-      - "8080:8080"
-    environment:
-      DB_URL: postgres://ha:ha_pass@postgres:5432/ha_db?sslmode=disable
-      MQTT_URL: tcp://mqtt:1883
-    depends_on:
-      - postgres
-      - mqtt
 volumes:
   mosq_data:
   pgdata:
